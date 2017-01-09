@@ -10,7 +10,7 @@ package roadgraph;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import java.util.Queue;
 
 
 import geography.GeographicPoint;
-import util.GraphLoader;
+//import util.GraphLoader;
 import util.TGraphLoader;
 
 public class TMapGraph {
@@ -40,8 +40,8 @@ public class TMapGraph {
 	}
 	public void setTrafficLevel(){
 		String str = hformat.format(cal.getTime());
-		//int hour = Integer.parseInt(str);
-		int hour = 7;
+		int hour = Integer.parseInt(str);
+		//int hour = 7;
 		if((hour>=7 && hour <=9) || (hour>=17 && hour<19))
 			trafficLevel = 3;  		// heavy traffic
 		else if(hour>11 && hour<13)

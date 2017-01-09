@@ -8,25 +8,25 @@ public class WeightedMapNode implements Comparable<WeightedMapNode>, Comparator<
 	private double distance;
 	private GeographicPoint location;
 	// for A*
-	private double heuristic;
+	private double heuristicVal;
 	
 	public WeightedMapNode(GeographicPoint loc, double dist){
 		distance = dist;
 		location = loc;
-		heuristic = 0;
+		heuristicVal = 0;
 		
 	}
 	
 	public WeightedMapNode(GeographicPoint loc, double dist, double h){
 		distance = dist;
 		location = loc;
-		heuristic = h;
+		heuristicVal = h;
 	}
 	
 	public WeightedMapNode(GeographicPoint loc){
 		distance = Double.POSITIVE_INFINITY;
 		location = loc;
-		heuristic = 0;
+		heuristicVal = 0;
 	}
 	
 	public GeographicPoint getLocation(){
@@ -41,14 +41,14 @@ public class WeightedMapNode implements Comparable<WeightedMapNode>, Comparator<
 		distance = dist;
 	}
 	public double getHeuristic(){
-		return heuristic;
+		return heuristicVal;
 	}
 	public void setHeuristic(double n){
-		heuristic = n;
+		heuristicVal = n;
 	}
 	public String toString(){
-		double t = distance+heuristic;
-		return location.toString()+" "+distance+" "+heuristic+" sum= "+t;
+		double t = distance+heuristicVal;
+		return location.toString()+" "+distance+" "+heuristicVal+" sum= "+t;
 	}
 	
 	@Override
