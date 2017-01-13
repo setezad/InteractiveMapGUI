@@ -63,11 +63,14 @@ This is not a new class but it was modified. A new data structure was added - an
 A description of classes for week 6 (implementing an extension):
 
 The purpose of this extension: This extension finds the fastest path between two intersections with respect to traffic (rush hour, etc) and speed limits.  Both path-finding algorithms, dijkstra and A*, have been modified to search for the  path of minimum duration versus length.
+
+Instruction for running the program:
+If you want to find the shortest path, run the “MapGraph” class. If you want the fastest path, run the “TMapGraph” class.
  
 Brief description of implementation:
 I used the road type information to assign speed limits to edges. I also added a parameter to factor in the traffic. This parameter can have three values to represent the following states: heavy, light, and no traffic. 
-I modified the dijkstra and A* implementation to look for the fastest path. The heuristic for A* is the distance between a node and goal divided by the speed limit of the edge connecting them. 
-I also modified the comparator for the priority queue to be able to sort the nodes based on time. 
+I modified the dijkstra and A* implementation to look for the fastest path. The heuristic for A* is the distance between a node and the goal divided by the speed limit of the edge connecting them. 
+I also modified the comparator of priority queue to be able to sort the nodes based on time. 
 
 ———
 Detailed list of classes and changes made to them:

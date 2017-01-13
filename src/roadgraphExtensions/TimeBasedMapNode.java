@@ -1,4 +1,4 @@
-package roadgraph;
+package roadgraphExtensions;
 
 import java.util.Comparator;
 import geography.GeographicPoint;
@@ -10,24 +10,36 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 	private double heuristic;
 	// For Extension
 	private double duration;
+	private double indivDur;
 	
 	public TimeBasedMapNode(GeographicPoint loc,double t){
+		if(t<0 || loc==null)
+			throw new IllegalArgumentException();
 		duration = t;
 		location = loc;
 		heuristic = 0;
+		indivDur = 0;
 	}
 	public TimeBasedMapNode(GeographicPoint loc){
+		if(loc==null)
+			throw new IllegalArgumentException();
 		duration = Double.POSITIVE_INFINITY;
 		location = loc;
 		heuristic = 0;
+		indivDur = 0;
 	}
 	public TimeBasedMapNode(GeographicPoint loc,double t,  double h){
+		if(t<0 || h<0 || loc==null)
+			throw new IllegalArgumentException();
 		duration = t;
 		location = loc;
 		heuristic = h;
+		indivDur = 0;
 	}
 	
 	public void setDuration(double t){
+		if(t<0)
+			throw new IllegalArgumentException();
 		duration = t;
 	}
 	public double getDuration(){
@@ -46,6 +58,8 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 		return heuristic;
 	}
 	public void setHeuristic(double h){
+		if(h<0)
+			throw new IllegalArgumentException();
 		heuristic = h;
 	}
 	
@@ -60,7 +74,15 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 		return comp;
 	}
 	
-
+	// needed for extension
+	public void setIndivDur(double t){
+		if(t<0)
+			throw new IllegalArgumentException();
+		this.indivDur = t;
+	}
+	public double getIndivDur(){
+		return this.indivDur; 
+	}
 	
 	
 }

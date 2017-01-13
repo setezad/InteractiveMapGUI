@@ -1,4 +1,4 @@
-package roadgraph;
+package roadgraphExtensions;
 
 import java.util.Comparator;
 

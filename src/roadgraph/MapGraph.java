@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import java.util.Queue;
 
 import geography.GeographicPoint;
+import roadgraphExtensions.TimeBasedMapNode;
 import util.GraphLoader;
 
 /**
@@ -105,11 +106,10 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 3
-		if(from!=null && to!=null && graph.hasV(from) && graph.hasV(to) && length>=0){
-			graph.addE(from, to, roadName, roadType, length);
-		}
-		else
+		if(from==null || to==null || !graph.hasV(from) || !graph.hasV(to) || length<0)
 			throw new IllegalArgumentException();
+		graph.addE(from, to, roadName, roadType, length);
+			
 	}
 	
 
@@ -242,8 +242,7 @@ public class MapGraph {
 				if(cur.equals(goal)){
 					flag = true;
 					//report the final cost
-					int index = nodes.indexOf(goal);
-					System.out.println(nodes.get(index).getDistance());
+					System.out.println(reportFinalCost(goal));
 					break;
 				}
 				nodeSearched.accept(cur);
@@ -275,6 +274,7 @@ public class MapGraph {
 		
 		return path;
 	}
+					
 	
 	// set distance 
 	private void setDistance(GeographicPoint loc,double dist){
@@ -330,7 +330,7 @@ public class MapGraph {
 		int count = 0;
 		System.out.println("AStar........");
 		//System.out.println(start.distance(goal));
-		graph.printGraph();
+		//graph.printGraph();
 		//Set comparator explicitly
 		Comparator<WeightedMapNode> comparator = new WeightedNodeComparator();
 		PriorityQueue<WeightedMapNode> pq = new PriorityQueue<WeightedMapNode>(5,comparator);
@@ -441,7 +441,7 @@ public class MapGraph {
 		System.out.println("Test 2 using utc: Dijkstra should be 13 and AStar should be 5");
 		testroute = testMap.dijkstra(testStart,testEnd);
 		testroute2 = testMap.aStarSearch(testStart,testEnd);
-		
+		System.out.println("dijkstra path "+testroute.toString());
 		
 		// A slightly more complex test using real data
 		testStart = new GeographicPoint(32.8674388, -117.2190213);
@@ -449,7 +449,7 @@ public class MapGraph {
 		System.out.println("Test 3 using utc: Dijkstra should be 37 and AStar should be 10");
 		testroute = testMap.dijkstra(testStart,testEnd);
 		testroute2 = testMap.aStarSearch(testStart,testEnd);
-		
+		System.out.println("dijkstra path "+testroute.toString());
 		
 		
 		/* Use this code in Week 3 End of Week Quiz */
@@ -460,12 +460,12 @@ public class MapGraph {
 
 		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
 		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
-		
-		
 		List<GeographicPoint> route = theMap.dijkstra(start,end);
 		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
+		System.out.println("dijkstra path "+route.toString());
+		
 		System.out.println("Here .............");
-		//System.out.println("******   ******************   ********************   ********************\n\n\n\n\n");
+		//System.out.println("******   ******************  \n\n");
 		MapGraph theMapS = new MapGraph();
 		GraphLoader.loadRoadMap("data/graders/mod3/map3.txt", theMapS);
 		start = new GeographicPoint(0, 0);

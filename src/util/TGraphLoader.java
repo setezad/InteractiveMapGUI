@@ -23,8 +23,7 @@ import java.util.regex.Pattern;
 import basicgraph.Graph;
 import geography.GeographicPoint;
 import geography.RoadSegment;
-//import roadgraph.MapGraph;
-import roadgraph.TMapGraph;
+import roadgraphExtensions.TMapGraph;
 
 
 public class TGraphLoader {
@@ -107,7 +106,7 @@ public class TGraphLoader {
 	 *   the graph as they are only used to display paths.
 	 */
 	
-	public static void loadRoadMap(String filename, roadgraph.TMapGraph map)
+	public static void loadRoadMap(String filename, roadgraphExtensions.TMapGraph map)
 	{
 		loadRoadMap(filename, map, null, null);
 	}
@@ -129,7 +128,7 @@ public class TGraphLoader {
 	 * @param map The graph to load the map into.  The graph is
 	 *   assumed to be directed.
 	 */
-	public static void loadRoadMap(String filename, roadgraph.TMapGraph map,  
+	public static void loadRoadMap(String filename, roadgraphExtensions.TMapGraph map,  
 			HashMap<GeographicPoint,HashSet<RoadSegment>> segments, 
 			Set<GeographicPoint> intersectionsToLoad)
 	{

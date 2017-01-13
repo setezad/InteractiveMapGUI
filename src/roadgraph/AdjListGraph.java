@@ -8,7 +8,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.ArrayList;
 
-class AdjListGraph {
+public class AdjListGraph {
 	private int numVertices;
 	private int numEdges;
 	private HashMap<GeographicPoint,ArrayList<RoadProperty>> adjList;
@@ -70,60 +70,4 @@ class AdjListGraph {
 	}
 }
 
-class RoadProperty{
-	String name;
-	String type;
-	double len;
-	GeographicPoint end;
-	double speed;
-	
-	RoadProperty(GeographicPoint loc,String arg1, String arg2, double n){
-		name = arg1;
-		type = arg2;
-		len = n;
-		end = loc;
-		setSpeed(type);
-	}
-	RoadProperty(){
-		name = "Street name";
-		type = "Street type";
-		len = 0;
-		end = new GeographicPoint(0,0);
-		setSpeed(type);
-	}
-	
-	private void setSpeed(String arg){
-		switch(arg){
-			case "residential": speed = 40;
-			break;
-			case "city street": speed = 50;
-			break;
-			case "unclassified": speed = 50;
-			break;
-			case "living_street": speed = 30;
-			break;
-			case "secondary": speed = 70;
-			break;
-			case "tertiary": speed = 60;
-			break;
-			default: speed = 50;
-		}
-	}
-	
-	double getLength(){
-		return len;
-	}
-	GeographicPoint getLocation(){
-		return end;
-	}
-	// For Extension
-	double getDuration(){
-		return (len/speed);
-	}
-	double getSpeed(){
-		return speed;
-	}
-	public String toString(){
-		return end.toString()+" "+name+" "+type+" "+len+" "+speed+"time= "+ (len/speed)+"\n";
-	}
-}
+
