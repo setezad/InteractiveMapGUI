@@ -163,8 +163,7 @@ public class TMapGraph {
 		for(TimeBasedMapNode entry:nodes){
 			entry.setDuration(Double.POSITIVE_INFINITY);
 		}
-		double curW, newCost;
-		double finalcost = 0;
+		double curW, finalcost = 0;
 		pq.add(new TimeBasedMapNode(start,0));
 		//this.setDistance(start, 0);
 		while(!pq.isEmpty()){
@@ -184,9 +183,8 @@ public class TMapGraph {
 				if(cur.equals(goal)){
 					found = true;
 					//report the final cost
-					// this needs to be updated if we are re-using partial paths instead of searching ??
 					finalcost = reportFinalCost(goal);
-					System.out.println("final cost (using an option better than the previously found paths)="+finalcost);
+					System.out.println("final cost (none of the previous paths were useful for this case)="+finalcost);
 					break;
 				}
 				nodeSearched.accept(cur);
@@ -202,18 +200,17 @@ public class TMapGraph {
 								traversal.replace(neighbor.getLocation(),cur);
 							else
 								traversal.put(neighbor.getLocation(),cur);
-							newCost = neighbor.getDuration()*trafficLevel+curW;
 							// check whether a path between this node/neighbor and the goal has been already found 
 							if(data.size()>0){
 								int num = pathList.size();
-								checkPreviouslyFoundPaths(pathList, neighbor.getLocation(), start, goal, newCost, traversal);
+								checkPreviouslyFoundPaths(pathList, neighbor.getLocation(), start, goal, t1, traversal);
 								if(pathList.size()>num)
 									alreadyFound = true;
 								if(!alreadyFound)
-									pq.add(new TimeBasedMapNode(neighbor.getLocation(),newCost));
+									pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1));
 							}
 							else{
-								pq.add(new TimeBasedMapNode(neighbor.getLocation(),newCost));
+								pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1));
 							}
 						}
 					}
@@ -238,7 +235,7 @@ public class TMapGraph {
 		return path;
 	}
 	
-	// checkPreviouslyFoundPaths(pathList, neighbor.getLocation(), start, goal, newCost, traversal)
+	// 
 	private void checkPreviouslyFoundPaths(HashMap<Double, LinkedList<GeographicPoint>> list, GeographicPoint loc, GeographicPoint st, 
 			 GeographicPoint g, double c, HashMap<GeographicPoint,GeographicPoint> map){
 		if(list==null || loc==null || st==null || g==null || c<0 || map==null)
@@ -249,23 +246,23 @@ public class TMapGraph {
 			LinkedList<GeographicPoint> temp = constructPath(st,loc,map);
 			temp.addAll(data.getPath(loc, g, trafficLevel));
 			list.put(w,temp );   
-			//return true;
 		}
-		//return false;
+		
 	}
 	
 	
 	//find the minimum cost among the previously found paths that match the conditions of our current search
 	private double getMinCost(HashMap<Double, LinkedList<GeographicPoint>> list){
-		double min = Double.MAX_VALUE;
 		if(list==null)
 			throw new IllegalArgumentException();
+		double min = Double.MAX_VALUE;
 		for(Double entry:list.keySet()){
 			if(entry<min)
 				min = entry;
 		}
 		return min;
 	}
+	
 	// get the path of minimum cost among those previously found that match the conditions of our current search
 	private LinkedList<GeographicPoint> getMincostPath(HashMap<Double, LinkedList<GeographicPoint>> list){
 		if(list==null)
@@ -323,19 +320,26 @@ public class TMapGraph {
 		PriorityQueue<TimeBasedMapNode> pq = new PriorityQueue<TimeBasedMapNode>(5,comparator);
 		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();
 		HashMap<GeographicPoint,GeographicPoint> traversal = new HashMap<GeographicPoint,GeographicPoint>();
+		HashMap<Double, LinkedList<GeographicPoint>> pathList = new HashMap<Double, LinkedList<GeographicPoint>>();
+		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
 		GeographicPoint cur;
 		boolean flag = false;
+		boolean alreadyFound = false;
 		ArrayList<RoadProperty> neighbors;
 		//initialize distances to infinity
 		for(TimeBasedMapNode entry:nodes){
 			entry.setDuration(Double.POSITIVE_INFINITY);
 		}
-		double curW, cost, heur;
+		double curW, cost, heur, finalcost = 0;
 		pq.add(new TimeBasedMapNode(start,0));
 		this.setDuration(start, 0,0);
 		while(!pq.isEmpty()){
 			curW = pq.peek().getDuration();
-			cost = pq.peek().getHeuristic();
+			if(curW>=getMinCost(pathList) && alreadyFound){
+				System.out.println("final cost (using previous paths)= "+getMinCost(pathList));
+				break;
+			}
+			cost = pq.peek().getHeuristic();   // for debugging
 			cur = pq.remove().getLocation();
 			++count;
 			//System.out.println(count+" "+cur.toString()+" current cost: "+curW+" heuristic= "+cost+"     sum= "+(cost+curW));
@@ -344,7 +348,8 @@ public class TMapGraph {
 				if(cur.equals(goal)){
 					flag = true;
 					//report the final cost
-					System.out.println("final cost= "+reportFinalCost(goal));
+					finalcost = reportFinalCost(goal);
+					System.out.println("final cost (none of the previous paths were useful for this case)= "+finalcost);
 					break;
 				}
 				nodeSearched.accept(cur);
@@ -360,10 +365,21 @@ public class TMapGraph {
 								traversal.replace(neighbor.getLocation(),cur);
 							else
 								traversal.put(neighbor.getLocation(),cur);
-							//double t = neighbor.getDuration()*trafficLevel+curW;
 							heur = neighbor.getLocation().distance(goal)/neighbor.getSpeed();
 							heur = heur*trafficLevel;
-							pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1,heur)); 
+							//pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1,heur)); 
+							// check whether a path between this node/neighbor and the goal has been already found 
+							if(data.size()>0){
+								int num = pathList.size();
+								checkPreviouslyFoundPaths(pathList, neighbor.getLocation(), start, goal, t1, traversal);
+								if(pathList.size()>num)
+									alreadyFound = true;
+								if(!alreadyFound)
+									pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1,heur)); 
+							}
+							else{
+								pq.add(new TimeBasedMapNode(neighbor.getLocation(),t1,heur)); 
+							}
 						}
 					}
 				}
@@ -371,9 +387,17 @@ public class TMapGraph {
 		}
 		System.out.println("total number of nodes processed= "+count);
 		// construct the path
-		LinkedList<GeographicPoint> path; 
-		if(flag)
+		
+		if((flag & !alreadyFound) || (flag && alreadyFound)){
+			// this means that the fastest path, with these conditions (start, goal, traffic), had not been found before 
+			//so we store this one now.
 			path  = constructPath(start,goal,traversal);
+			data.addPath(start, goal, trafficLevel, finalcost, nodes, path); //keep this path
+		}
+		else if (!flag && alreadyFound){
+			// this means that the fastest path has been found before
+			path = getMincostPath(pathList);
+		}
 		else
 			path = null;
 		
@@ -417,8 +441,8 @@ public class TMapGraph {
 		testroute = simpleTestMap.dijkstra(new GeographicPoint(4,1),new GeographicPoint(8,-1));
 		System.out.println("PATH - with data: "+testroute.toString()+"\n");
 //		@SuppressWarnings("unused")
-//		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart,testEnd);
-//		System.out.println("PATH: "+testroute2.toString()+"\n");
+		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart,testEnd);
+		System.out.println("PATH: "+testroute2.toString()+"\n");
 //		
 		TMapGraph testMap = new TMapGraph();
 		TGraphLoader.loadRoadMap("data/maps/utc.map", testMap);
@@ -426,44 +450,46 @@ public class TMapGraph {
 //		// A very simple test using real data
 		testStart = new GeographicPoint(32.869423, -117.220917);
 		testEnd = new GeographicPoint(32.869255, -117.216927);
-		//System.out.println("Test 2 using utc: Dijkstra should be 13 and AStar should be 5");
+		testroute2 = testMap.aStarSearch(testStart,testEnd);
+		System.out.println("PATH: "+testroute2.toString()+"\n");
+		
 		testroute = testMap.dijkstra(testStart,testEnd);
 		System.out.println("PATH: "+testroute.toString()+"\n");
-//		testroute2 = testMap.aStarSearch(testStart,testEnd);
-//		System.out.println("PATH: "+testroute2.toString()+"\n");
+		
 //		
 //		
 //		// A slightly more complex test using real data
-//		testStart = new GeographicPoint(32.8674388, -117.2190213);
-//		testEnd = new GeographicPoint(32.8697828, -117.2244506);
-//		//System.out.println("Test 3 using utc: Dijkstra should be 37 and AStar should be 10");
-//		testroute = testMap.dijkstra(testStart,testEnd);
-//		System.out.println("PATH: "+testroute.toString()+"\n");
-//		testroute2 = testMap.aStarSearch(testStart,testEnd);
-//		System.out.println("PATH: "+testroute2.toString()+"\n");
+		testStart = new GeographicPoint(32.8674388, -117.2190213);
+		testEnd = new GeographicPoint(32.8697828, -117.2244506);
+		//System.out.println("Test 3 using utc: Dijkstra should be 37 and AStar should be 10");
+		testroute2 = testMap.aStarSearch(testStart,testEnd);
+		System.out.println("PATH: "+testroute2.toString()+"\n");
+		testroute = testMap.dijkstra(testStart,testEnd);
+		System.out.println("PATH: "+testroute.toString()+"\n");
+		
 //		
 //		
 //		/* Use this code in Week 3 End of Week Quiz */
-//		TMapGraph theMap = new TMapGraph();
-//		System.out.print("DONE. \nLoading the map...");
-//		TGraphLoader.loadRoadMap("data/maps/utc.map", theMap);
-//		System.out.println("DONE.");
-//
-//		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
-//		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
-//		
-//		List<GeographicPoint> route = theMap.dijkstra(start,end);
-//		System.out.println("PATH: "+route.toString()+"\n");
-//		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
-//		System.out.println("PATH: "+route2.toString()+"\n");
+		TMapGraph theMap = new TMapGraph();
+		//System.out.print("DONE. \nLoading the map...");
+		TGraphLoader.loadRoadMap("data/maps/utc.map", theMap);
+		//System.out.println("DONE.");
+
+		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
+		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
+		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
+		System.out.println("PATH: "+route2.toString()+"\n");
+		List<GeographicPoint> route = theMap.dijkstra(start,end);
+		System.out.println("PATH: "+route.toString()+"\n");
+		
 //		System.out.println("Here .............");
 //		//System.out.println("******   ******************   ********************   ********************\n\n\n\n\n");
-//		TMapGraph theMapS = new TMapGraph();
-//		TGraphLoader.loadRoadMap("data/graders/mod3/map3.txt", theMapS);
-//		start = new GeographicPoint(0, 0);
-//		end = new GeographicPoint(0, 4);
-//		route = theMapS.dijkstra( start,end);
-//		System.out.println("PATH: "+route.toString()+"\n");
+		TMapGraph theMapS = new TMapGraph();
+		TGraphLoader.loadRoadMap("data/graders/mod3/map3.txt", theMapS);
+		start = new GeographicPoint(0, 0);
+		end = new GeographicPoint(0, 4);
+		route = theMapS.dijkstra( start,end);
+		System.out.println("PATH: "+route.toString()+"\n");
 		
 	}
 	
