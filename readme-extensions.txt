@@ -1,0 +1,1 @@
+My work is mostly in two packages: the roadgraph package where I implemented the assignments, and the roadgraphExtensions package where I implemented two of the suggested extensions on the course website. More explanations on these extensions is available in their folder. 
