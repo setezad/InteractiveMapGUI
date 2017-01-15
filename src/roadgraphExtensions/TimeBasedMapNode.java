@@ -7,7 +7,7 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 	//private double distance;
 	private GeographicPoint location;
 	// for A*
-	private double heuristic;
+	private double heuristicVal;
 	// For Extension
 	private double duration;
 	private double indivDur;
@@ -17,7 +17,7 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 			throw new IllegalArgumentException();
 		duration = t;
 		location = loc;
-		heuristic = 0;
+		heuristicVal = 0;
 		indivDur = 0;
 	}
 	public TimeBasedMapNode(GeographicPoint loc){
@@ -25,7 +25,7 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 			throw new IllegalArgumentException();
 		duration = Double.POSITIVE_INFINITY;
 		location = loc;
-		heuristic = 0;
+		heuristicVal = 0;
 		indivDur = 0;
 	}
 	public TimeBasedMapNode(GeographicPoint loc,double t,  double h){
@@ -33,7 +33,7 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 			throw new IllegalArgumentException();
 		duration = t;
 		location = loc;
-		heuristic = h;
+		heuristicVal = h;
 		indivDur = 0;
 	}
 	
@@ -51,16 +51,16 @@ public class TimeBasedMapNode implements Comparable<TimeBasedMapNode>, Comparato
 	}
 	
 	public String toString(){
-		double t = duration+heuristic;
-		return location.toString()+" "+duration+" "+heuristic+" sum= "+t;
+		double t = duration+heuristicVal;
+		return location.toString()+" "+duration+" "+heuristicVal+" sum= "+t;
 	}
 	public double getHeuristic(){
-		return heuristic;
+		return heuristicVal;
 	}
 	public void setHeuristic(double h){
 		if(h<0)
 			throw new IllegalArgumentException();
-		heuristic = h;
+		heuristicVal = h;
 	}
 	
 	@Override
